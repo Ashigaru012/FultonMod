@@ -9,21 +9,17 @@ import net.minecraft.world.World;
 public class EntityFulton extends EntityLiving
 {
     private int duration = 180;
-    private int timer = 140;
+    private int timer = 100;
     private boolean begin_flag = true;
 
     public EntityFulton(World worldIn) { super(worldIn);}
 
-    @Override
-    public void updateRidden(){
-        System.out.println(444444444);
-    }
 
     @Override
     public void onLivingUpdate() {
         super.onLivingUpdate();
         if(this.begin_flag){
-            this.setVelocity(0,0.1,0);
+            this.setVelocity(0,0.01,0);
             this.begin_flag = false;
         }
         if(this.timer > 0){

@@ -149,50 +149,32 @@ public class Robby
         {
             final  double posY = target.posY;
             World worldIn = playerIn.world;
-
-
-
-
-            if (target instanceof Entity)
+            if(playerIn.isSneaking() || !playerIn.isSneaking())
             {
-                if (!worldIn.isRemote) {
-                    double motionY = target.motionY + 0.5;
-                    EntityFulton entityfulton = new EntityFulton(worldIn);
-                    System.out.println(target.getPosition());
-                    entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
-                    worldIn.spawnEntity(entityfulton);
-                    target.startRiding(entityfulton);
-                    entityfulton.setNoGravity(true);
-                    target.setNoGravity(true);
-//                    entityfulton.onUpdate();
-                    int duration = 180;
-//                    entityfulton.setVelocity(0,1,0);
-//                    entityfulton.updateRidden();
-//
-//                    entityfulton.onEntityUpdate();
-//                    double PosY = entityfulton.posY+3;
+                if (target instanceof Entity)
+                {
+                    if (!worldIn.isRemote) {
+                        double motionY = target.motionY + 0.5;
+                        EntityFulton entityfulton = new EntityFulton(worldIn);
+                        System.out.println(target.getPosition());
+                        entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
+                        worldIn.spawnEntity(entityfulton);
+                        target.startRiding(entityfulton);
+                        entityfulton.setNoGravity(true);
+                        target.setNoGravity(true);
+                    }
 
-                    //遅延処理はfultonのEntityクラスでonUpdateを書き換えてやれ
-//                    while(onUpdate(entityfulton)){
-//                        System.out.println(this.duration);
-//                        entityfulton.motionY=0;
-//                        entityfulton.setVelocity(0,0,0);
-//                    }
-                    this.duration = 180;
+                    return true;
                 }
+                else
+                {
+                    return false;
+                }
+            }
 
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return true;
         }
     }
-
-
-    
-
 
 }
 
