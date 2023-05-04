@@ -5,6 +5,7 @@ import net.minecraft.client.audio.ISound;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.*;
 import net.minecraft.entity.monster.EntityCreeper;
@@ -20,6 +21,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.fml.client.FMLClientHandler;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -27,6 +29,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
@@ -36,7 +39,11 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.Sys;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
+import org.lwjgl.input.Keyboard;
 
+import java.lang.annotation.*;
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.RetentionPolicy.*;
 
 @Mod(modid = Robby.MODID,name = Robby.NAME, version = Robby.VERSION,acceptedMinecraftVersions = Robby.MCVER)
 public class Robby
@@ -55,6 +62,7 @@ public class Robby
     public boolean moving;
     public boolean opened;
 
+    public KeyBinding[] keyBindings;
 
 
 
@@ -119,7 +127,6 @@ public class Robby
         private int duration = 5 * 60000;
 
         public  final ResourceLocation sound = new ResourceLocation("moonrosemod:sounds/fulton_up.ogg");
-        Minecraft mc = FMLClientHandler.instance().getClient();
 
 
         public boolean onUpdate(EntityLivingBase entityIn) {
@@ -145,9 +152,37 @@ public class Robby
             pressTime++;
 
         }
+        //共通化用メソッド
+        public boolean fulton_up(ItemStack stack, EntityPlayer playerIn, Entity target){
+            final  double posY = target.posY;
+            World worldIn = playerIn.world;
+            if(playerIn.isSneaking() || !playerIn.isSneaking())
+            {
+                if (target instanceof Entity)
+                {
+                    if (!worldIn.isRemote) {
+                        double motionY = target.motionY + 0.5;
+                        EntityFulton entityfulton = new EntityFulton(worldIn);
+                        System.out.println(target.getPosition());
+                        entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
+                        worldIn.spawnEntity(entityfulton);
+                        target.startRiding(entityfulton);
+                        entityfulton.setNoGravity(true);
+                        target.setNoGravity(true);
+                    }
 
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
 
+            return true;
+        }
 
+        @SubscribeEvent(priority= EventPriority.HIGHEST, receiveCanceled=true)
         public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand)
         {
             final  double posY = target.posY;
@@ -176,6 +211,37 @@ public class Robby
             }
 
             return true;
+        }
+
+        public boolean onLeftClickEntity(ItemStack stack, EntityPlayer playerIn, Entity target)
+        {
+            final  double posY = target.posY;
+            World worldIn = playerIn.world;
+            if(playerIn.isSneaking())
+            {
+                if (target instanceof Entity)
+                {
+                    if (!worldIn.isRemote) {
+                        double motionY = target.motionY + 0.5;
+                        EntityFulton entityfulton = new EntityFulton(worldIn);
+                        System.out.println(target.getPosition());
+                        entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
+                        worldIn.spawnEntity(entityfulton);
+                        target.startRiding(entityfulton);
+                        entityfulton.setNoGravity(true);
+                        target.setNoGravity(true);
+                    }
+
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
+
+            return false;
+
         }
     }
 
