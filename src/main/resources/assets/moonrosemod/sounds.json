@@ -1,0 +1,11 @@
+{
+  "fulton_up": {
+    "category": "master",
+    "sounds": [
+      {
+        "name": "moonrosemod:fulton_up",
+        "stream": false
+      }
+    ]
+  }
+}

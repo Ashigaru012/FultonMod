@@ -1,6 +1,7 @@
 package com.moonrose.moonrosemod;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.audio.ISound;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
@@ -10,6 +11,7 @@ import net.minecraft.entity.monster.EntityCreeper;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.*;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
@@ -17,6 +19,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.fml.client.FMLClientHandler;
 import net.minecraftforge.fml.client.registry.IRenderFactory;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.common.FMLCommonHandler;
@@ -31,6 +34,8 @@ import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.Sys;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 
 
 @Mod(modid = Robby.MODID,name = Robby.NAME, version = Robby.VERSION,acceptedMinecraftVersions = Robby.MCVER)
@@ -113,11 +118,9 @@ public class Robby
 
         private int duration = 5 * 60000;
 
-//        @SideOnly(Side.CLIENT)
-//        public boolean shouldRotateAroundWhenRendering()
-//        {
-//            return true;
-//        }
+        public  final ResourceLocation sound = new ResourceLocation("moonrosemod:sounds/fulton_up.ogg");
+        Minecraft mc = FMLClientHandler.instance().getClient();
+
 
         public boolean onUpdate(EntityLivingBase entityIn) {
 //            entityIn.setVelocity(0,1,0);
