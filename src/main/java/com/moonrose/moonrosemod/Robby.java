@@ -32,6 +32,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
@@ -42,10 +43,12 @@ import net.minecraft.util.SoundEvent;
 import org.lwjgl.input.Keyboard;
 
 import java.lang.annotation.*;
+
+import static com.moonrose.moonrosemod.Robby.*;
 import static java.lang.annotation.ElementType.*;
 import static java.lang.annotation.RetentionPolicy.*;
 
-@Mod(modid = Robby.MODID,name = Robby.NAME, version = Robby.VERSION,acceptedMinecraftVersions = Robby.MCVER)
+@Mod(modid = MODID,name = NAME, version = VERSION,acceptedMinecraftVersions = MCVER)
 public class Robby
 {
     public static final String MODID = "moonrosemod";
@@ -56,13 +59,18 @@ public class Robby
 
 
     public static Item ruby;
-    public static Item amethyst;
+    public static Item fulton;
     public static Item greenapple;
+    public static Item idroid;
     public int ticks;
     public boolean moving;
     public boolean opened;
 
     public KeyBinding[] keyBindings;
+
+    @Mod.Instance
+    public static Robby INSTANCE;
+    public static final int GUI_ID = 0;
 
 
 
@@ -72,6 +80,8 @@ public class Robby
         // some example code
         System.out.println("DIRT BLOCK >> "+Blocks.DIRT.getUnlocalizedName());
         EntityRegistry.registerModEntity(new ResourceLocation("Fulton"),EntityFulton.class,"Fulton",0,this,250, 1, true);
+        NetworkRegistry.INSTANCE.registerGuiHandler(this.INSTANCE, new IDROIDModGuiHandler());
+
 
     }
 
@@ -91,13 +101,22 @@ public class Robby
         ModelLoader.setCustomModelResourceLocation(ruby,0,new ModelResourceLocation(ruby.getRegistryName(),"inventory"));
 
 
-        amethyst = new ItemFulton()
-                .setUnlocalizedName("amethyst")
+        fulton = new ItemFulton()
+                .setUnlocalizedName("fulton")
                 .setMaxStackSize(64)
                 .setCreativeTab(CreativeTabs.MISC)
-                .setRegistryName(new ResourceLocation(MODID,"amethyst"));
-        ForgeRegistries.ITEMS.register(amethyst);
-        ModelLoader.setCustomModelResourceLocation(amethyst, 0, new ModelResourceLocation(MODID + ":amethyst","inventory"));
+                .setRegistryName(new ResourceLocation(MODID,"fulton"));
+        ForgeRegistries.ITEMS.register(fulton);
+        ModelLoader.setCustomModelResourceLocation(fulton, 0, new ModelResourceLocation(MODID + ":fulton","inventory"));
+
+        idroid = new ItemiDROID()
+                .setUnlocalizedName("idroid")
+                .setMaxStackSize(1)
+                .setCreativeTab(CreativeTabs.MISC)
+                .setRegistryName(new ResourceLocation(MODID,"idroid"));
+        ForgeRegistries.ITEMS.register(idroid);
+        ModelLoader.setCustomModelResourceLocation(idroid,0,new ModelResourceLocation(MODID + ":idroid","inventory"));
+
 
         if(event.getSide().isClient()){
             RenderingRegistry.registerEntityRenderingHandler(EntityFulton.class, new IRenderFactory<EntityFulton>() {
@@ -153,11 +172,10 @@ public class Robby
 
         }
         //共通化用メソッド
-        public boolean fulton_up(ItemStack stack, EntityPlayer playerIn, Entity target){
-            final  double posY = target.posY;
+        public void fulton_up(EntityPlayer playerIn, Entity target)
+        {
+
             World worldIn = playerIn.world;
-            if(playerIn.isSneaking() || !playerIn.isSneaking())
-            {
                 if (target instanceof Entity)
                 {
                     if (!worldIn.isRemote) {
@@ -167,81 +185,32 @@ public class Robby
                         entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
                         worldIn.spawnEntity(entityfulton);
                         target.startRiding(entityfulton);
-                        entityfulton.setNoGravity(true);
-                        target.setNoGravity(true);
+                        target.setEntityInvulnerable(true);
+                        target.setCustomNameTag("target");
                     }
-
-                    return true;
                 }
-                else
-                {
-                    return false;
-                }
-            }
-
-            return true;
         }
 
         @SubscribeEvent(priority= EventPriority.HIGHEST, receiveCanceled=true)
         public boolean itemInteractionForEntity(ItemStack stack, EntityPlayer playerIn, EntityLivingBase target, EnumHand hand)
         {
-            final  double posY = target.posY;
-            World worldIn = playerIn.world;
             if(playerIn.isSneaking() || !playerIn.isSneaking())
             {
-                if (target instanceof Entity)
-                {
-                    if (!worldIn.isRemote) {
-                        double motionY = target.motionY + 0.5;
-                        EntityFulton entityfulton = new EntityFulton(worldIn);
-                        System.out.println(target.getPosition());
-                        entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
-                        worldIn.spawnEntity(entityfulton);
-                        target.startRiding(entityfulton);
-                        entityfulton.setNoGravity(true);
-                        target.setNoGravity(true);
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                fulton_up(playerIn,target);
             }
-
             return true;
         }
 
         public boolean onLeftClickEntity(ItemStack stack, EntityPlayer playerIn, Entity target)
         {
-            final  double posY = target.posY;
-            World worldIn = playerIn.world;
             if(playerIn.isSneaking())
             {
-                if (target instanceof Entity)
-                {
-                    if (!worldIn.isRemote) {
-                        double motionY = target.motionY + 0.5;
-                        EntityFulton entityfulton = new EntityFulton(worldIn);
-                        System.out.println(target.getPosition());
-                        entityfulton.setPosition(target.posX + 0.5, target.posY + 0.5, target.posZ + 0.5);
-                        worldIn.spawnEntity(entityfulton);
-                        target.startRiding(entityfulton);
-                        entityfulton.setNoGravity(true);
-                        target.setNoGravity(true);
-                    }
-
-                    return true;
-                }
-                else
-                {
-                    return false;
-                }
+                fulton_up(playerIn,target);
+                return true;
             }
-
-            return false;
-
+            else {
+                return false;
+            }
         }
     }
 
